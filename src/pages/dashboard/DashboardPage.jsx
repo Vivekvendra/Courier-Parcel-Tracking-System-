@@ -6,28 +6,29 @@ import {
   Clock,
   Calendar,
   Sparkles,
-  ArrowUpRight,
   TrendingUp,
   TrendingDown,
   Eye,
   MoreHorizontal,
   ChevronDown,
-  Plus,
-  Minus,
-  Maximize2,
   MapPin,
   Globe,
   Radio,
   Search,
-  Check,
-  X
+  ExternalLink,
+  Shield,
+  Activity
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Modal from '../../components/common/Modal';
 
-export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
+export const DashboardPage = (props) => {
   const { currentUser } = useAuth();
+  const outletContext = useOutletContext() || {};
+  const initialTrackQuery = props.initialTrackQuery || outletContext.searchTrackQuery;
+  const onClearTrackQuery = props.onClearTrackQuery || outletContext.onClearTrackQuery;
 
   // State
   const [trendsMonth, setTrendsMonth] = useState('This Month');
@@ -151,32 +152,32 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
 
   return (
     <div className="space-y-5 pb-10">
-      {/* 1. TOP HERO BANNER (Exact background image / layout from reference) */}
+      {/* 1. TOP HERO BANNER (Crisp clean background from login-bg.png, ZERO overlapping text) */}
       <div
-        className="w-full rounded-2xl p-5 sm:p-6 lg:p-7 shadow-sm border border-slate-200/80 relative overflow-hidden bg-cover bg-center flex flex-col justify-between min-h-[145px]"
+        className="w-full rounded-2xl p-5 sm:p-6 lg:p-7 shadow-sm border border-slate-200/90 relative overflow-hidden bg-cover bg-right flex flex-col justify-between min-h-[148px]"
         style={{
-          backgroundImage: "url('/dash-banner.jpg')"
+          backgroundImage: "url('/clean-banner.jpg')"
         }}
       >
-        {/* Soft gradient wash on left for maximum text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent pointer-events-none" />
+        {/* Soft white-to-transparent gradient on left so text is 100% crisp and readable with zero ghosting */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none" />
 
-        {/* Top row of banner: Pill tag on left, Date on right */}
+        {/* Top row of banner */}
         <div className="relative z-10 flex items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-orange-200/80 shadow-2xs text-[11px] font-bold text-slate-800">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-orange-200 shadow-sm text-[11px] font-bold text-slate-800">
             <Sparkles className="w-3.5 h-3.5 text-[#FF6B00]" />
             <span>
               TrackEase Operations Suite • Live <span className="text-[#FF6B00]">Central Control</span>
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-2xs text-xs font-bold text-slate-800">
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-slate-200 shadow-sm text-xs font-bold text-slate-800">
+            <Calendar className="w-3.5 h-3.5 text-[#FF6B00]" />
             <span>Mon, 15 Sep 2026</span>
           </div>
         </div>
 
-        {/* Bottom row of banner: Welcome headline & Subtitle */}
+        {/* Bottom row of banner: Crisp Headline & Subtitle */}
         <div className="relative z-10 mt-3 sm:mt-4 max-w-xl">
           <h1 className="text-xl sm:text-2xl lg:text-[26px] font-black tracking-tight text-[#0F172A] flex items-center gap-2">
             <span>Welcome back, {currentUser?.name || 'Admin Manager'}!</span>
@@ -188,7 +189,7 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
         </div>
       </div>
 
-      {/* 2. THE 4 METRIC STAT CARDS (Matching exact colors, sparklines & icons) */}
+      {/* 2. THE 4 METRIC STAT CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: TOTAL SHIPMENTS */}
         <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs relative overflow-hidden group hover:shadow-md transition-all">
@@ -214,7 +215,7 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
               </p>
             </div>
           </div>
-          {/* Wave sparkline SVG in bottom right */}
+          {/* Wave sparkline */}
           <div className="absolute -bottom-1 right-0 w-28 h-10 pointer-events-none opacity-80">
             <svg viewBox="0 0 100 35" className="w-full h-full" preserveAspectRatio="none">
               <path
@@ -255,7 +256,7 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
               </p>
             </div>
           </div>
-          {/* Wave sparkline SVG in bottom right */}
+          {/* Wave sparkline */}
           <div className="absolute -bottom-1 right-0 w-28 h-10 pointer-events-none opacity-80">
             <svg viewBox="0 0 100 35" className="w-full h-full" preserveAspectRatio="none">
               <path
@@ -296,7 +297,7 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
               </p>
             </div>
           </div>
-          {/* Wave sparkline SVG in bottom right */}
+          {/* Wave sparkline */}
           <div className="absolute -bottom-1 right-0 w-28 h-10 pointer-events-none opacity-80">
             <svg viewBox="0 0 100 35" className="w-full h-full" preserveAspectRatio="none">
               <path
@@ -337,7 +338,7 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
               </p>
             </div>
           </div>
-          {/* Wave sparkline SVG in bottom right */}
+          {/* Wave sparkline */}
           <div className="absolute -bottom-1 right-0 w-28 h-10 pointer-events-none opacity-80">
             <svg viewBox="0 0 100 35" className="w-full h-full" preserveAspectRatio="none">
               <path
@@ -355,26 +356,24 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
         </div>
       </div>
 
-      {/* 3. MIDDLE ROW (Shipment Trends, Live Shipments Map, Connected World Card) */}
+      {/* 3. MIDDLE ROW (Shipment Trends, Razor-Sharp Vector Map, Connected World) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* CARD 1: SHIPMENT TRENDS BAR CHART (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-3">
               <h3 className="text-sm font-bold text-[#0F172A]">Shipment Trends</h3>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => toast.info('Timeframe filter active: This Month')}
-                  className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 rounded-lg flex items-center gap-1 hover:bg-slate-100 transition cursor-pointer"
-                >
-                  <span>{trendsMonth}</span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => toast.info('Timeframe filter active: This Month')}
+                className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 rounded-lg flex items-center gap-1 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <span>{trendsMonth}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
             </div>
 
-            {/* Legend row matching reference image */}
+            {/* Legend row */}
             <div className="flex flex-wrap items-center gap-3 pt-1 pb-3 text-[11px] font-semibold text-slate-600">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-blue-600" />
@@ -395,32 +394,27 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
             </div>
           </div>
 
-          {/* Clustered Bar Chart Graphic matching the reference screenshot */}
+          {/* Clustered Bar Chart Graphic */}
           <div className="mt-2 pt-2 border-t border-slate-100">
             <div className="flex items-end justify-between h-44 px-1 pb-2">
               {barChartData.map((d) => (
                 <div key={d.month} className="flex flex-col items-center gap-1.5 flex-1 group cursor-pointer">
-                  {/* Group of 4 bars */}
                   <div className="flex items-end gap-1 h-36">
-                    {/* Bar 1: Total */}
                     <div
                       style={{ height: `${(d.total / 1000) * 100}%` }}
                       className="w-1.5 sm:w-2 bg-blue-600 rounded-t-sm transition-all group-hover:brightness-110"
                       title={`${d.month} Total: ${d.total}`}
                     />
-                    {/* Bar 2: Delivered */}
                     <div
                       style={{ height: `${(d.delivered / 1000) * 100}%` }}
                       className="w-1.5 sm:w-2 bg-emerald-500 rounded-t-sm transition-all group-hover:brightness-110"
                       title={`${d.month} Delivered: ${d.delivered}`}
                     />
-                    {/* Bar 3: In Transit */}
                     <div
                       style={{ height: `${(d.inTransit / 1000) * 100}%` }}
                       className="w-1.5 sm:w-2 bg-cyan-500 rounded-t-sm transition-all group-hover:brightness-110"
                       title={`${d.month} In Transit: ${d.inTransit}`}
                     />
-                    {/* Bar 4: Pending */}
                     <div
                       style={{ height: `${(d.pending / 1000) * 100}%` }}
                       className="w-1.5 sm:w-2 bg-[#FF6B00] rounded-t-sm transition-all group-hover:brightness-110"
@@ -436,7 +430,7 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
           </div>
         </div>
 
-        {/* CARD 2: LIVE SHIPMENTS MAP (4 cols) */}
+        {/* CARD 2: RAZOR-SHARP VECTOR MAP (4 cols) - ZERO blur, ZERO baked-in text */}
         <div className="lg:col-span-4 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-2 relative z-10">
             <h3 className="text-sm font-bold text-[#0F172A]">Live Shipments Map</h3>
@@ -450,30 +444,71 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
             </button>
           </div>
 
-          {/* Map canvas container with custom background */}
-          <div
-            className="w-full h-48 rounded-xl relative overflow-hidden border border-slate-100 flex items-center justify-center bg-cover bg-center"
-            style={{
-              backgroundImage: "url('/dash-map.jpg')"
-            }}
-          >
-            {/* Floating Live Tracking Card (Matching Reference Screenshot) */}
-            <div className="absolute top-2.5 right-12 bg-white/95 backdrop-blur-md rounded-xl p-2.5 shadow-md border border-slate-200/80 text-left z-10 max-w-[170px] animate-in fade-in duration-300">
+          {/* Crisp SVG Vector Map Container (No blurred image) */}
+          <div className="w-full h-48 rounded-xl relative overflow-hidden border border-slate-100 bg-gradient-to-b from-[#F0F7FF] via-[#E6F0FA] to-[#EDF4FC] flex items-center justify-center">
+            {/* SVG Background Grid & Geographic Contours */}
+            <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="mapGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+                  <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#D1E2F4" strokeWidth="0.8" />
+                </pattern>
+                <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FF6B00" />
+                  <stop offset="100%" stopColor="#3B82F6" />
+                </linearGradient>
+              </defs>
+
+              {/* Grid background */}
+              <rect width="100%" height="100%" fill="url(#mapGrid)" />
+
+              {/* Soft geographic land shape silhouette */}
+              <path
+                d="M 60,30 Q 130,10 220,35 Q 280,60 250,130 Q 210,180 150,175 Q 80,170 50,110 Z"
+                fill="#DEEBF7"
+                opacity="0.85"
+              />
+
+              {/* Transit Route Line */}
+              <path
+                d="M 90,135 Q 140,115 175,65"
+                fill="none"
+                stroke="url(#routeGradient)"
+                strokeWidth="3.5"
+                strokeDasharray="6,4"
+              />
+
+              {/* Origin Point: Bengaluru */}
+              <circle cx="90" cy="135" r="7" fill="#FF6B00" />
+              <circle cx="90" cy="135" r="14" fill="#FF6B00" opacity="0.25" className="animate-ping" />
+
+              {/* Moving Vehicle Position */}
+              <g transform="translate(130, 102)">
+                <circle cx="0" cy="0" r="10" fill="#3B82F6" />
+                <text x="0" y="3.5" textAnchor="middle" fill="#FFFFFF" fontSize="9" fontWeight="bold">🚚</text>
+              </g>
+
+              {/* Destination Point: Hyderabad */}
+              <circle cx="175" cy="65" r="7" fill="#EF4444" />
+              <circle cx="175" cy="65" r="13" fill="#EF4444" opacity="0.25" />
+            </svg>
+
+            {/* Crisp Floating Tooltip Card */}
+            <div className="absolute top-2.5 right-3 bg-white/95 backdrop-blur-md rounded-xl p-2.5 shadow-lg border border-slate-200/90 text-left z-10 max-w-[175px]">
               <div className="flex items-center gap-1.5 mb-1">
-                <div className="w-4 h-4 rounded-md bg-[#FF6B00] flex items-center justify-center text-white text-[9px] font-black">
+                <div className="w-4 h-4 rounded bg-[#FF6B00] flex items-center justify-center text-white text-[9px] font-black">
                   📦
                 </div>
                 <span className="font-mono font-bold text-[11px] text-[#0F172A]">
                   TRK-9821-BLR
                 </span>
               </div>
-              <div className="inline-block px-1.5 py-0.2 rounded bg-blue-50 text-blue-600 font-bold text-[9px] mb-1">
+              <div className="inline-block px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 font-bold text-[9px] mb-1">
                 In Transit
               </div>
               <p className="text-[10px] font-semibold text-slate-700 leading-tight">
                 Bengaluru → Hyderabad
               </p>
-              <p className="text-[9px] text-slate-400 mt-0.5">Est. 2 days</p>
+              <p className="text-[9px] text-slate-400 mt-0.5 font-medium">Est. 2 days</p>
             </div>
 
             {/* Map Zoom Controls on Bottom Right */}
@@ -496,22 +531,25 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
           </div>
         </div>
 
-        {/* CARD 3: DELIVERING A CONNECTED WORLD (3 cols) */}
-        <div
-          className="lg:col-span-3 rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-2xs flex flex-col justify-between text-white relative overflow-hidden bg-cover bg-center min-h-[190px]"
-          style={{
-            backgroundImage: "url('/dash-globe.jpg')"
-          }}
-        >
-          {/* Subtle gradient dark wash */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/60 to-transparent pointer-events-none" />
+        {/* CARD 3: DELIVERING A CONNECTED WORLD (3 cols) - Ultra-crisp vector globe & dark blue theme */}
+        <div className="lg:col-span-3 rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-sm flex flex-col justify-between text-white relative overflow-hidden bg-gradient-to-br from-[#0B1528] via-[#0F1E36] to-[#0A1325] min-h-[190px]">
+          {/* Crisp Background SVG Network Arcs & Globe (Zero blur) */}
+          <svg className="absolute -right-4 -bottom-4 w-44 h-44 opacity-25 pointer-events-none" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="#38BDF8" strokeWidth="1" />
+            <circle cx="50" cy="50" r="30" fill="none" stroke="#38BDF8" strokeWidth="0.8" />
+            <path d="M 5,50 Q 50,20 95,50" fill="none" stroke="#38BDF8" strokeWidth="1" strokeDasharray="3,3" />
+            <path d="M 5,50 Q 50,80 95,50" fill="none" stroke="#38BDF8" strokeWidth="1" strokeDasharray="3,3" />
+            <circle cx="35" cy="40" r="3" fill="#FF6B00" />
+            <circle cx="65" cy="45" r="3" fill="#38BDF8" />
+            <circle cx="50" cy="65" r="3" fill="#10B981" />
+          </svg>
 
           {/* Top header & Icon */}
           <div className="relative z-10">
             <div className="w-8 h-8 rounded-lg bg-[#FF6B00] flex items-center justify-center text-white mb-2 shadow-sm">
               <Package className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-black leading-tight text-white">
+            <h3 className="text-sm font-black leading-tight text-white tracking-tight">
               Delivering a Connected World
             </h3>
             <p className="text-[11px] text-slate-300 mt-0.5 leading-snug">
@@ -659,17 +697,14 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
 
             {/* Donut Chart & Legend */}
             <div className="flex items-center justify-between gap-3 mt-3.5">
-              {/* Circular Donut Ring */}
               <div className="relative w-24 h-24 flex-shrink-0 flex items-center justify-center">
                 <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
-                  {/* Background Track */}
                   <path
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
                     stroke="#E2E8F0"
                     strokeWidth="3.8"
                   />
-                  {/* Emerald Success Arc (98.4%) */}
                   <path
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
@@ -677,7 +712,6 @@ export const DashboardPage = ({ initialTrackQuery, onClearTrackQuery }) => {
                     strokeDasharray="98.4, 100"
                     strokeWidth="3.8"
                     strokeLinecap="round"
-                    className="text-cyan-500"
                   />
                 </svg>
 

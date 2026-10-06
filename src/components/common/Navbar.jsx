@@ -65,7 +65,7 @@ export const Navbar = ({ onOpenMobileSidebar, onSearchQuery, onOpenTrackModal })
         <button
           type="button"
           onClick={onOpenMobileSidebar}
-          className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none"
+          className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none"
           aria-label="Open sidebar"
         >
           <Menu className="w-5 h-5" />
