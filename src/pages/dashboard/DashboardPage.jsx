@@ -20,11 +20,12 @@ import {
   Activity
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Modal from '../../components/common/Modal';
 
 export const DashboardPage = (props) => {
+  const navigate = useNavigate();
   const { currentUser } = useAuth();
   const outletContext = useOutletContext() || {};
   const initialTrackQuery = props.initialTrackQuery || outletContext.searchTrackQuery;
@@ -584,7 +585,7 @@ export const DashboardPage = (props) => {
               <h3 className="text-sm font-bold text-[#0F172A]">Recent Shipments</h3>
               <button
                 type="button"
-                onClick={() => handleOpenTracker('TRK-9821-BLR')}
+                onClick={() => navigate('/shipments')}
                 className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
               >
                 View All →
@@ -859,6 +860,18 @@ export const DashboardPage = (props) => {
                 Ping Driver
               </button>
             </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setTrackModalOpen(false);
+                navigate(`/tracking?number=${trackedShipment.trackingNo}`);
+              }}
+              className="w-full py-2.5 bg-[#FF6B00] hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/20 cursor-pointer"
+            >
+              <span>Open Full Tracking Radar & Audit (Module 5)</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </button>
           </div>
         )}
       </Modal>

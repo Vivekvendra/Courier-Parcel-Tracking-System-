@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Package,
   Plus,
@@ -17,7 +18,8 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
-  Download
+  Download,
+  Compass
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -28,6 +30,7 @@ import { SkeletonRow } from '../../components/common/SkeletonLoader';
 import EmptyState from '../../components/common/EmptyState';
 
 export const ShipmentsPage = () => {
+  const navigate = useNavigate();
   const { shipments, loading, error, createShipment, updateShipment, deleteShipment, generateTrackingNumber } = useShipments();
 
   // Search, Filter & Sort State
@@ -228,6 +231,7 @@ export const ShipmentsPage = () => {
               <option value="Out for Delivery">Out for Delivery</option>
               <option value="Picked Up">Picked Up</option>
               <option value="Pending">Pending</option>
+              <option value="Failed Delivery">Failed Delivery</option>
               <option value="Cancelled">Cancelled</option>
             </select>
           </div>
@@ -381,6 +385,17 @@ export const ShipmentsPage = () => {
                     {/* Actions */}
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       <div className="inline-flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/tracking?number=${s.trackingNumber}`);
+                          }}
+                          className="p-1.5 rounded-lg hover:bg-orange-50 text-slate-500 hover:text-[#FF6B00] transition"
+                          title="Track Parcel (Module 5)"
+                        >
+                          <Compass className="w-4 h-4" />
+                        </button>
                         <button
                           type="button"
                           onClick={(e) => handleOpenDetails(s, e)}
@@ -557,11 +572,13 @@ export const ShipmentsPage = () => {
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:border-[#FF6B00] focus:outline-none bg-white font-medium"
                 {...createForm.register('deliveryStatus')}
               >
-                <option value="In Transit">In Transit</option>
-                <option value="Picked Up">Picked Up</option>
                 <option value="Pending">Pending</option>
+                <option value="Picked Up">Picked Up</option>
+                <option value="In Transit">In Transit</option>
                 <option value="Out for Delivery">Out for Delivery</option>
                 <option value="Delivered">Delivered</option>
+                <option value="Failed Delivery">Failed Delivery</option>
+                <option value="Cancelled">Cancelled</option>
               </select>
             </div>
           </div>
@@ -678,11 +695,12 @@ export const ShipmentsPage = () => {
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:border-[#FF6B00] focus:outline-none bg-white font-medium"
                 {...editForm.register('deliveryStatus')}
               >
-                <option value="In Transit">In Transit</option>
-                <option value="Picked Up">Picked Up</option>
                 <option value="Pending">Pending</option>
+                <option value="Picked Up">Picked Up</option>
+                <option value="In Transit">In Transit</option>
                 <option value="Out for Delivery">Out for Delivery</option>
                 <option value="Delivered">Delivered</option>
+                <option value="Failed Delivery">Failed Delivery</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
             </div>

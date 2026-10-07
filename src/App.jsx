@@ -15,6 +15,8 @@ import DashboardLayout from './components/common/DashboardLayout';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import ShipmentsPage from './pages/shipments/ShipmentsPage';
 import CustomersPage from './pages/customers/CustomersPage';
+import TrackingPage from './pages/tracking/TrackingPage';
+import DeliveryStatusPage from './pages/delivery-status/DeliveryStatusPage';
 
 function App() {
   return (
@@ -60,6 +62,8 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/shipments" element={<ShipmentsPage />} />
                 <Route path="/customers" element={<CustomersPage />} />
+                <Route path="/tracking" element={<TrackingPage />} />
+                <Route path="/delivery-status" element={<DeliveryStatusPage />} />
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
               </Route>
 

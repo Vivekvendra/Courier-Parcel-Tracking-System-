@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchThirdPartyShipments } from '../services/api';
 import { initialRecentShipments } from '../data/mockData';
+import { buildInitialStatusHistory, getShipmentCurrentLocation, getCourierAgentDetails } from '../utils/trackingUtils';
 
 const ShipmentContext = createContext(null);
 
@@ -11,6 +12,23 @@ export const ShipmentProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper to ensure each shipment has complete tracking metadata
+  const enrichShipment = (s) => {
+    const history = (s.statusHistory && s.statusHistory.length > 0)
+      ? s.statusHistory
+      : buildInitialStatusHistory(s);
+
+    const location = s.currentLocation || getShipmentCurrentLocation(s);
+    const carrier = s.carrierInfo || getCourierAgentDetails(s);
+
+    return {
+      ...s,
+      statusHistory: history,
+      currentLocation: location,
+      carrierInfo: carrier
+    };
+  };
+
   // Load shipments on mount: LocalStorage first, otherwise Third-Party API
   useEffect(() => {
     const loadShipments = async () => {
@@ -19,7 +37,9 @@ export const ShipmentProvider = ({ children }) => {
       try {
         const cached = localStorage.getItem(STORAGE_KEY);
         if (cached) {
-          setShipments(JSON.parse(cached));
+          const parsed = JSON.parse(cached);
+          const enriched = parsed.map(enrichShipment);
+          setShipments(enriched);
           setLoading(false);
           return;
         }
@@ -27,11 +47,12 @@ export const ShipmentProvider = ({ children }) => {
         // Fetch from third-party API
         const apiData = await fetchThirdPartyShipments();
         if (apiData && apiData.length > 0) {
-          setShipments(apiData);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(apiData));
+          const enriched = apiData.map(enrichShipment);
+          setShipments(enriched);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched));
         } else {
           // Fallback initial data
-          const fallback = initialRecentShipments.map((s, idx) => ({
+          const fallback = initialRecentShipments.map((s) => ({
             id: s.id,
             trackingNumber: s.trackingNumber,
             senderName: s.sender,
@@ -45,8 +66,9 @@ export const ShipmentProvider = ({ children }) => {
             deliveryStatus: s.status,
             notes: 'Primary freight assignment'
           }));
-          setShipments(fallback);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback));
+          const enriched = fallback.map(enrichShipment);
+          setShipments(enriched);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(enriched));
         }
       } catch (err) {
         setError('Failed to load shipment records. Please try again.');
@@ -72,12 +94,12 @@ export const ShipmentProvider = ({ children }) => {
     return `${prefix}-${randNum}-${suffix}`;
   };
 
-  // Create Shipment
+  // Create Shipment (Module 3)
   const createShipment = async (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         const trackingNumber = data.trackingNumber || generateTrackingNumber(data.pickupAddress || 'BLR');
-        const newShipment = {
+        const rawShipment = {
           id: 'shp-' + Date.now(),
           trackingNumber,
           senderName: data.senderName.trim(),
@@ -88,10 +110,11 @@ export const ShipmentProvider = ({ children }) => {
           parcelType: data.parcelType || 'Standard Box',
           shippingDate: data.shippingDate || new Date().toISOString().split('T')[0],
           expectedDeliveryDate: data.expectedDeliveryDate || new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
-          deliveryStatus: data.deliveryStatus || 'In Transit',
+          deliveryStatus: data.deliveryStatus || 'Pending',
           notes: data.notes || ''
         };
 
+        const newShipment = enrichShipment(rawShipment);
         const updated = [newShipment, ...shipments];
         saveShipments(updated);
         resolve(newShipment);
@@ -99,7 +122,7 @@ export const ShipmentProvider = ({ children }) => {
     });
   };
 
-  // Update Shipment
+  // Update Shipment (Module 3)
   const updateShipment = async (id, updatedFields) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -109,23 +132,95 @@ export const ShipmentProvider = ({ children }) => {
           return;
         }
 
+        const current = shipments[index];
+        const statusChanged = updatedFields.deliveryStatus && updatedFields.deliveryStatus !== current.deliveryStatus;
+
+        let updatedHistory = current.statusHistory || [];
+        if (statusChanged) {
+          const newEntry = {
+            id: `sth-${Date.now()}`,
+            status: updatedFields.deliveryStatus,
+            timestamp: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' • ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            location: updatedFields.pickupAddress || 'Regional Logistics Hub',
+            updatedBy: 'Operations Desk',
+            note: updatedFields.notes || `Status modified to ${updatedFields.deliveryStatus}`
+          };
+          updatedHistory = [...updatedHistory, newEntry];
+        }
+
         const updatedShipment = {
-          ...shipments[index],
+          ...current,
           ...updatedFields,
           parcelWeight: updatedFields.parcelWeight?.includes('kg')
             ? updatedFields.parcelWeight
-            : `${parseFloat(updatedFields.parcelWeight || 1.5)} kg`
+            : `${parseFloat(updatedFields.parcelWeight || 1.5)} kg`,
+          statusHistory: updatedHistory
         };
 
+        const finalEnriched = enrichShipment(updatedShipment);
         const updated = [...shipments];
-        updated[index] = updatedShipment;
+        updated[index] = finalEnriched;
         saveShipments(updated);
-        resolve(updatedShipment);
+        resolve(finalEnriched);
       }, 350);
     });
   };
 
-  // Delete Shipment
+  // Update Delivery Status (Module 6)
+  const updateDeliveryStatus = async (identifier, newStatus, details = {}) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = shipments.findIndex(
+          (s) => s.id === identifier || s.trackingNumber.toLowerCase() === identifier.toLowerCase()
+        );
+
+        if (index === -1) {
+          reject(new Error('Shipment record not found'));
+          return;
+        }
+
+        const current = shipments[index];
+        const timestampStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+          ' • ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        const historyEntry = {
+          id: `sth-${Date.now()}`,
+          status: newStatus,
+          timestamp: timestampStr,
+          location: details.location || current.currentLocation?.hub || 'Regional Cargo Hub',
+          updatedBy: details.updatedBy || 'Operations Lead',
+          note: details.note || (details.reason ? `${details.reason}: Status updated to ${newStatus}` : `Status updated to ${newStatus}`)
+        };
+
+        const updatedHistory = [...(current.statusHistory || []), historyEntry];
+
+        let updatedLocation = current.currentLocation;
+        if (details.location) {
+          updatedLocation = {
+            ...current.currentLocation,
+            hub: details.location,
+            lastScanned: timestampStr
+          };
+        }
+
+        const updatedShipment = {
+          ...current,
+          deliveryStatus: newStatus,
+          statusHistory: updatedHistory,
+          currentLocation: updatedLocation,
+          notes: details.note ? `${current.notes ? current.notes + ' | ' : ''}${details.note}` : current.notes
+        };
+
+        const finalEnriched = enrichShipment(updatedShipment);
+        const updatedList = [...shipments];
+        updatedList[index] = finalEnriched;
+        saveShipments(updatedList);
+        resolve(finalEnriched);
+      }, 300);
+    });
+  };
+
+  // Delete Shipment (Module 3)
   const deleteShipment = async (id) => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -136,12 +231,23 @@ export const ShipmentProvider = ({ children }) => {
     });
   };
 
-  // Find shipment by ID or tracking number
+  // Find shipment by ID or tracking number (Module 5)
   const getShipment = (identifier) => {
+    if (!identifier) return null;
     return shipments.find(
       (s) =>
         s.id === identifier ||
-        s.trackingNumber.toLowerCase() === identifier.toLowerCase()
+        s.trackingNumber.toLowerCase() === identifier.toLowerCase().trim()
+    );
+  };
+
+  // Find multiple shipments by tracking numbers (Module 5: Track Multiple Shipments)
+  const getMultipleShipments = (trackingNumbers = []) => {
+    if (!Array.isArray(trackingNumbers) || trackingNumbers.length === 0) return [];
+    const normalized = trackingNumbers.map((t) => t.trim().toLowerCase()).filter(Boolean);
+    return shipments.filter((s) =>
+      normalized.includes(s.trackingNumber.toLowerCase()) ||
+      normalized.includes(s.id.toLowerCase())
     );
   };
 
@@ -151,8 +257,10 @@ export const ShipmentProvider = ({ children }) => {
     error,
     createShipment,
     updateShipment,
+    updateDeliveryStatus,
     deleteShipment,
     getShipment,
+    getMultipleShipments,
     generateTrackingNumber,
     reload: () => {
       localStorage.removeItem(STORAGE_KEY);
@@ -170,3 +278,5 @@ export const useShipments = () => {
   }
   return context;
 };
+
+export default ShipmentContext;

@@ -87,14 +87,10 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
   ];
 
   const handleNavClick = (link, e) => {
-    const isImplemented = ['/dashboard', '/shipments', '/customers'].includes(link.to);
+    const isImplemented = ['/dashboard', '/shipments', '/customers', '/tracking', '/delivery-status'].includes(link.to);
     if (!isImplemented) {
       e.preventDefault();
-      if (link.to === '/tracking') {
-        onOpenTrackModal && onOpenTrackModal();
-      } else {
-        toast.info(`${link.label} belongs to ${link.badge || 'Module'}. Upcoming module.`);
-      }
+      toast.info(`${link.label} belongs to ${link.badge || 'Module'}. Upcoming module.`);
     }
     if (isMobileOpen) {
       setIsMobileOpen(false);
@@ -228,7 +224,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
                 </p>
                 <button
                   type="button"
-                  onClick={() => onOpenTrackModal && onOpenTrackModal('TRK-9821-BLR')}
+                  onClick={() => navigate('/tracking?number=TRK-9821-BLR')}
                   className="mt-2.5 px-3 py-1 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-[10px] font-bold rounded-lg shadow-sm shadow-orange-500/20 inline-flex items-center gap-1 transition cursor-pointer"
                 >
                   <span>Track Now</span>

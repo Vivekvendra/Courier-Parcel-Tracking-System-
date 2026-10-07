@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Menu,
   Search,
@@ -16,6 +17,7 @@ import { toast } from 'react-toastify';
 
 export const Navbar = ({ onOpenMobileSidebar, onSearchQuery, onOpenTrackModal }) => {
   const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [notifications, setNotifications] = useState(initialNotifications);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -54,8 +56,9 @@ export const Navbar = ({ onOpenMobileSidebar, onSearchQuery, onOpenTrackModal })
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
-    onSearchQuery && onSearchQuery(searchTerm.trim());
-    onOpenTrackModal && onOpenTrackModal(searchTerm.trim());
+    const cleanQuery = searchTerm.trim();
+    onSearchQuery && onSearchQuery(cleanQuery);
+    navigate(`/tracking?number=${encodeURIComponent(cleanQuery)}`);
   };
 
   return (
