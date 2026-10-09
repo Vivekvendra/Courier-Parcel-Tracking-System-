@@ -12,22 +12,20 @@ import {
   Shield
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { initialNotifications } from '../../data/mockData';
+import { useNotifications } from '../../context/NotificationContext';
 import { toast } from 'react-toastify';
 
 export const Navbar = ({ onOpenMobileSidebar, onSearchQuery, onOpenTrackModal }) => {
   const { currentUser, logout } = useAuth();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [notifications, setNotifications] = useState(initialNotifications);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const searchInputRef = useRef(null);
   const notifRef = useRef(null);
   const profileRef = useRef(null);
-
-  const unreadCount = 2; // matching the "2" badge in reference image
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -104,9 +102,11 @@ export const Navbar = ({ onOpenMobileSidebar, onSearchQuery, onOpenTrackModal })
             aria-label="Notifications"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
-              {unreadCount}
-            </span>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white">
+                {unreadCount}
+              </span>
+            )}
           </button>
 
           {/* Notifications Dropdown */}
@@ -115,34 +115,89 @@ export const Navbar = ({ onOpenMobileSidebar, onSearchQuery, onOpenTrackModal })
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-bold text-[#0F172A]">Notifications</h4>
-                  <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 text-xs font-bold">
-                    {unreadCount} new
-                  </span>
+                  {unreadCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 text-xs font-bold">
+                      {unreadCount} new
+                    </span>
+                  )}
                 </div>
+                {unreadCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      markAllAsRead();
+                      toast.success('Marked all as read');
+                    }}
+                    className="text-xs font-semibold text-[#FF6B00] hover:underline cursor-pointer"
+                  >
+                    Mark all read
+                  </button>
+                )}
               </div>
 
               <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto my-2">
-                {notifications.slice(0, 2).map((n) => (
-                  <div
-                    key={n.id}
-                    className="py-2.5 px-2 rounded-xl transition-colors cursor-pointer flex items-start gap-3 bg-orange-50/30"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      {n.type === 'success' ? (
-                        <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                      ) : (
-                        <Radio className="w-3.5 h-3.5 text-blue-500" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-bold text-slate-800">{n.title}</p>
-                        <span className="text-[10px] text-slate-400">{n.time}</span>
-                      </div>
-                      <p className="text-xs text-slate-600 mt-0.5 leading-snug">{n.message}</p>
-                    </div>
+                {notifications.length === 0 ? (
+                  <div className="py-6 text-center text-xs text-slate-400">
+                    No recent notifications
                   </div>
-                ))}
+                ) : (
+                  notifications.slice(0, 4).map((n) => (
+                    <div
+                      key={n.id}
+                      onClick={() => {
+                        markAsRead(n.id);
+                        if (n.trackingNumber) {
+                          setIsNotifOpen(false);
+                          navigate(`/tracking?number=${n.trackingNumber}`);
+                        }
+                      }}
+                      className={`py-2.5 px-2 rounded-xl transition-colors cursor-pointer flex items-start gap-3 ${
+                        !n.read ? 'bg-orange-50/40' : 'hover:bg-slate-50'
+                      }`}
+                    >
+                      <div
+                        className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs ${
+                          n.type === 'DELIVERY_COMPLETED'
+                            ? 'bg-emerald-100 text-emerald-600'
+                            : n.type === 'FAILED_ALERT'
+                            ? 'bg-red-100 text-red-600'
+                            : 'bg-blue-100 text-blue-600'
+                        }`}
+                      >
+                        {n.type === 'DELIVERY_COMPLETED' ? (
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        ) : n.type === 'FAILED_ALERT' ? (
+                          <AlertCircle className="w-3.5 h-3.5" />
+                        ) : (
+                          <Radio className="w-3.5 h-3.5" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className={`text-xs font-bold truncate ${!n.read ? 'text-slate-900' : 'text-slate-700'}`}>
+                            {n.title}
+                          </p>
+                          <span className="text-[10px] text-slate-400 flex-shrink-0 ml-1">{n.timestamp}</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-snug">{n.message}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Dropdown Footer */}
+              <div className="pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsNotifOpen(false);
+                    navigate('/notifications');
+                  }}
+                  className="w-full py-2 rounded-xl bg-slate-50 hover:bg-orange-50 text-slate-700 hover:text-[#FF6B00] text-xs font-bold transition text-center cursor-pointer block"
+                >
+                  View All Notifications →
+                </button>
               </div>
             </div>
           )}

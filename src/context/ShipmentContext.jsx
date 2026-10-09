@@ -2,12 +2,14 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchThirdPartyShipments } from '../services/api';
 import { initialRecentShipments } from '../data/mockData';
 import { buildInitialStatusHistory, getShipmentCurrentLocation, getCourierAgentDetails } from '../utils/trackingUtils';
+import { useNotifications } from './NotificationContext';
 
 const ShipmentContext = createContext(null);
 
 const STORAGE_KEY = 'trackease_shipments_data';
 
 export const ShipmentProvider = ({ children }) => {
+  const { addNotification } = useNotifications();
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -94,7 +96,7 @@ export const ShipmentProvider = ({ children }) => {
     return `${prefix}-${randNum}-${suffix}`;
   };
 
-  // Create Shipment (Module 3)
+  // Create Shipment
   const createShipment = async (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -117,12 +119,24 @@ export const ShipmentProvider = ({ children }) => {
         const newShipment = enrichShipment(rawShipment);
         const updated = [newShipment, ...shipments];
         saveShipments(updated);
+
+        // Shipment Created Notification
+        if (addNotification) {
+          addNotification({
+            type: 'SHIPMENT_CREATED',
+            title: 'Shipment Created',
+            message: `New consignment ${newShipment.trackingNumber} registered for ${newShipment.receiverName}.`,
+            trackingNumber: newShipment.trackingNumber,
+            severity: 'info'
+          });
+        }
+
         resolve(newShipment);
       }, 400);
     });
   };
 
-  // Update Shipment (Module 3)
+  // Update Shipment
   const updateShipment = async (id, updatedFields) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -166,7 +180,7 @@ export const ShipmentProvider = ({ children }) => {
     });
   };
 
-  // Update Delivery Status (Module 6)
+  // Update Delivery Status
   const updateDeliveryStatus = async (identifier, newStatus, details = {}) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -215,12 +229,42 @@ export const ShipmentProvider = ({ children }) => {
         const updatedList = [...shipments];
         updatedList[index] = finalEnriched;
         saveShipments(updatedList);
+
+        // Dispatch Live Notifications
+        if (addNotification) {
+          if (newStatus === 'Delivered') {
+            addNotification({
+              type: 'DELIVERY_COMPLETED',
+              title: 'Delivery Completed',
+              message: `Parcel ${current.trackingNumber} successfully delivered to ${current.receiverName}.`,
+              trackingNumber: current.trackingNumber,
+              severity: 'success'
+            });
+          } else if (newStatus === 'Failed Delivery') {
+            addNotification({
+              type: 'FAILED_ALERT',
+              title: 'Failed Delivery Alert',
+              message: `Delivery attempt failed for ${current.trackingNumber}. Consignee unavailable at ${details.location || 'destination address'}.`,
+              trackingNumber: current.trackingNumber,
+              severity: 'error'
+            });
+          } else {
+            addNotification({
+              type: 'STATUS_UPDATE',
+              title: 'Delivery Status Updated',
+              message: `Consignment ${current.trackingNumber} updated to "${newStatus}" at ${details.location || 'regional transit hub'}.`,
+              trackingNumber: current.trackingNumber,
+              severity: 'info'
+            });
+          }
+        }
+
         resolve(finalEnriched);
       }, 300);
     });
   };
 
-  // Delete Shipment (Module 3)
+  // Delete Shipment
   const deleteShipment = async (id) => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -231,7 +275,7 @@ export const ShipmentProvider = ({ children }) => {
     });
   };
 
-  // Find shipment by ID or tracking number (Module 5)
+  // Find shipment by ID or tracking number
   const getShipment = (identifier) => {
     if (!identifier) return null;
     return shipments.find(
@@ -241,7 +285,7 @@ export const ShipmentProvider = ({ children }) => {
     );
   };
 
-  // Find multiple shipments by tracking numbers (Module 5: Track Multiple Shipments)
+  // Find multiple shipments by tracking numbers
   const getMultipleShipments = (trackingNumbers = []) => {
     if (!Array.isArray(trackingNumbers) || trackingNumbers.length === 0) return [];
     const normalized = trackingNumbers.map((t) => t.trim().toLowerCase()).filter(Boolean);

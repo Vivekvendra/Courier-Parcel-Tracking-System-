@@ -172,26 +172,62 @@ export const initialRecentShipments = [
 export const initialNotifications = [
   {
     id: 'notif-1',
-    title: 'Shipment Delivered',
-    message: 'Parcel TRK-9821-BLR was successfully delivered to Priya Sharma.',
-    time: '10m ago',
+    type: 'DELIVERY_COMPLETED',
+    title: 'Delivery Completed',
+    message: 'Parcel TRK-9821-BLR was successfully handed over to Priya Sharma in Koramangala, Bengaluru.',
+    trackingNumber: 'TRK-9821-BLR',
+    timestamp: '12m ago',
     read: false,
-    type: 'success'
+    severity: 'success'
   },
   {
     id: 'notif-2',
-    title: 'Out for Delivery',
-    message: 'Shipment TRK-9820-MUM is now out for delivery in Mumbai.',
-    time: '25m ago',
+    type: 'STATUS_UPDATE',
+    title: 'Delivery Status Updated',
+    message: 'Shipment TRK-9820-MUM is now Out for Delivery with courier agent Rahul Verma in Mumbai.',
+    trackingNumber: 'TRK-9820-MUM',
+    timestamp: '35m ago',
     read: false,
-    type: 'info'
+    severity: 'info'
   },
   {
     id: 'notif-3',
-    title: 'High Volume Alert',
-    message: 'New surge in Bengaluru sorting hub (+38 parcels in queue).',
-    time: '2h ago',
+    type: 'FAILED_ALERT',
+    title: 'Failed Delivery Alert',
+    message: 'Consignee unavailable at Koramangala delivery address for TRK-9818-HYD. Re-attempt scheduled for next morning.',
+    trackingNumber: 'TRK-9818-HYD',
+    timestamp: '1h ago',
+    read: false,
+    severity: 'error'
+  },
+  {
+    id: 'notif-4',
+    type: 'SHIPMENT_CREATED',
+    title: 'Shipment Created',
+    message: 'New consignment TRK-9819-DEL manifest registered for Ananya Gupta (Delhi to Sector 62, Noida).',
+    trackingNumber: 'TRK-9819-DEL',
+    timestamp: '2h ago',
     read: true,
-    type: 'warning'
+    severity: 'info'
+  },
+  {
+    id: 'notif-5',
+    type: 'STATUS_UPDATE',
+    title: 'Delivery Status Updated',
+    message: 'Freight TRK-9817-CHE has been picked up from origin facility in Chennai and reached central depot.',
+    trackingNumber: 'TRK-9817-CHE',
+    timestamp: '4h ago',
+    read: true,
+    severity: 'info'
+  },
+  {
+    id: 'notif-6',
+    type: 'DELIVERY_COMPLETED',
+    title: 'Delivery Completed',
+    message: 'Consignment TRK-7715-HYD signature confirmed. Handed over to recipient Sneha Reddy in Hitec City.',
+    trackingNumber: 'TRK-7715-HYD',
+    timestamp: 'Yesterday',
+    read: true,
+    severity: 'success'
   }
 ];

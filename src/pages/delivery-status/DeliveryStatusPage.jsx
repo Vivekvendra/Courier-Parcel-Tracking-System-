@@ -20,7 +20,11 @@ import {
   ChevronRight,
   RefreshCw,
   ExternalLink,
-  ChevronLeft
+  ChevronLeft,
+  Activity,
+  Layers,
+  Sparkles,
+  TrendingUp
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -170,96 +174,99 @@ export const DeliveryStatusPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-orange-100 text-[#FF6B00]">
-              Module 6
-            </span>
-            <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
-              Delivery Status Management
-            </h1>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold mb-2">
+            <Activity className="w-3.5 h-3.5" />
+            <span>Operations & Lifecycle Flow</span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
+            Delivery Status Management
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Operational pipeline, lifecycle transitions, status history audit, and bulk dispatch management.
           </p>
         </div>
 
         {/* View Switcher: Table vs Kanban */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200">
-            <button
-              type="button"
-              onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'table'
-                  ? 'bg-white text-[#FF6B00] shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <TableIcon className="w-3.5 h-3.5" />
-              <span>Table</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('kanban')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'kanban'
-                  ? 'bg-white text-[#FF6B00] shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Kanban className="w-3.5 h-3.5" />
-              <span>Kanban</span>
-            </button>
-          </div>
+        <div className="flex items-center p-1.5 bg-slate-100 rounded-2xl border border-slate-200 self-start md:self-auto">
+          <button
+            type="button"
+            onClick={() => setViewMode('table')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              viewMode === 'table'
+                ? 'bg-white text-[#FF6B00] shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <TableIcon className="w-4 h-4" />
+            <span>Table View</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('kanban')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              viewMode === 'kanban'
+                ? 'bg-white text-[#FF6B00] shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Kanban className="w-4 h-4" />
+            <span>Kanban Board</span>
+          </button>
         </div>
       </div>
 
-      {/* Status Metrics Bar (Module 6 Metrics) */}
+      {/* 6 Status Metrics Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs">
-          <span className="text-[11px] font-semibold text-slate-400 block">Total Volume</span>
-          <p className="text-xl font-black text-slate-900 mt-0.5">{metrics.total}</p>
-          <span className="text-[10px] text-slate-500 font-medium">All recorded bookings</span>
+        {/* Total Volume */}
+        <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Volume</span>
+          <p className="text-2xl font-black text-slate-900 mt-1">{metrics.total}</p>
+          <span className="text-[10px] text-slate-500 font-medium">All consignments</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-amber-200/80 shadow-2xs bg-amber-50/20">
-          <span className="text-[11px] font-semibold text-amber-600 block">Pending</span>
-          <p className="text-xl font-black text-amber-700 mt-0.5">{metrics.pending}</p>
-          <span className="text-[10px] text-amber-600/80 font-medium">Awaiting pickup</span>
+        {/* Pending */}
+        <div className="bg-white p-4 rounded-2xl border border-amber-200 shadow-2xs bg-amber-50/20">
+          <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider block">Pending</span>
+          <p className="text-2xl font-black text-amber-700 mt-1">{metrics.pending}</p>
+          <span className="text-[10px] text-amber-600/90 font-medium">Awaiting pickup</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-blue-200/80 shadow-2xs bg-blue-50/20">
-          <span className="text-[11px] font-semibold text-blue-600 block">In Transit</span>
-          <p className="text-xl font-black text-blue-700 mt-0.5">{metrics.inTransit}</p>
-          <span className="text-[10px] text-blue-600/80 font-medium">En route corridors</span>
+        {/* In Transit */}
+        <div className="bg-white p-4 rounded-2xl border border-blue-200 shadow-2xs bg-blue-50/20">
+          <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">In Transit</span>
+          <p className="text-2xl font-black text-blue-700 mt-1">{metrics.inTransit}</p>
+          <span className="text-[10px] text-blue-600/90 font-medium">En route hubs</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-purple-200/80 shadow-2xs bg-purple-50/20">
-          <span className="text-[11px] font-semibold text-purple-600 block">Out for Delivery</span>
-          <p className="text-xl font-black text-purple-700 mt-0.5">{metrics.outForDelivery}</p>
-          <span className="text-[10px] text-purple-600/80 font-medium">Final mile dispatch</span>
+        {/* Out for Delivery */}
+        <div className="bg-white p-4 rounded-2xl border border-purple-200 shadow-2xs bg-purple-50/20">
+          <span className="text-[11px] font-bold text-purple-600 uppercase tracking-wider block">Out for Delivery</span>
+          <p className="text-2xl font-black text-purple-700 mt-1">{metrics.outForDelivery}</p>
+          <span className="text-[10px] text-purple-600/90 font-medium">Final mile van</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-emerald-200/80 shadow-2xs bg-emerald-50/20">
-          <span className="text-[11px] font-semibold text-emerald-600 block">Delivered</span>
-          <p className="text-xl font-black text-emerald-700 mt-0.5">{metrics.delivered}</p>
-          <span className="text-[10px] text-emerald-600 font-semibold">{metrics.successRate}% success rate</span>
+        {/* Delivered */}
+        <div className="bg-white p-4 rounded-2xl border border-emerald-200 shadow-2xs bg-emerald-50/20">
+          <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block">Delivered</span>
+          <p className="text-2xl font-black text-emerald-700 mt-1">{metrics.delivered}</p>
+          <span className="text-[10px] text-emerald-600 font-bold">{metrics.successRate}% rate</span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border border-red-200/80 shadow-2xs bg-red-50/20">
-          <span className="text-[11px] font-semibold text-red-600 block">Exceptions / Failed</span>
-          <p className="text-xl font-black text-red-700 mt-0.5">{metrics.issues}</p>
-          <span className="text-[10px] text-red-600/80 font-medium">Action required</span>
+        {/* Exceptions */}
+        <div className="bg-white p-4 rounded-2xl border border-red-200 shadow-2xs bg-red-50/20">
+          <span className="text-[11px] font-bold text-red-600 uppercase tracking-wider block">Exceptions</span>
+          <p className="text-2xl font-black text-red-700 mt-1">{metrics.issues}</p>
+          <span className="text-[10px] text-red-600/90 font-medium">Action needed</span>
         </div>
       </div>
 
       {/* Search, Status Tabs & Bulk Action Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs space-y-3">
-        {/* Search Input */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-2xs space-y-3.5">
+        {/* Search Input & Bulk action */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -271,7 +278,7 @@ export const DeliveryStatusPage = () => {
                 setCurrentPage(1);
               }}
               placeholder="Search by tracking number, sender, receiver, destination..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6B00] focus:ring-2 focus:ring-orange-100 transition"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6B00] transition"
             />
           </div>
 
@@ -284,14 +291,14 @@ export const DeliveryStatusPage = () => {
               <button
                 type="button"
                 onClick={() => setIsBulkModalOpen(true)}
-                className="px-3 py-1 bg-[#FF6B00] hover:bg-[#EA580C] text-white font-bold rounded-lg transition cursor-pointer"
+                className="px-3 py-1.5 bg-[#FF6B00] hover:bg-[#EA580C] text-white font-bold rounded-lg transition cursor-pointer shadow-2xs"
               >
                 Change Status
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedIds([])}
-                className="px-2 py-1 text-slate-500 hover:text-slate-700 font-semibold cursor-pointer"
+                className="px-2.5 py-1 text-slate-500 hover:text-slate-800 font-semibold cursor-pointer"
               >
                 Clear
               </button>
@@ -299,7 +306,7 @@ export const DeliveryStatusPage = () => {
           )}
         </div>
 
-        {/* 7 Status Filter Tabs with Counts (Module 6 Requirement) */}
+        {/* 7 Status Filter Tabs with Counts */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
           <button
             type="button"
@@ -307,9 +314,9 @@ export const DeliveryStatusPage = () => {
               setSelectedStatusTab('All');
               setCurrentPage(1);
             }}
-            className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer flex items-center gap-1.5 flex-shrink-0 ${
+            className={`px-3.5 py-1.5 rounded-xl font-bold transition cursor-pointer flex items-center gap-1.5 flex-shrink-0 ${
               selectedStatusTab === 'All'
-                ? 'bg-[#0F172A] text-white shadow-xs'
+                ? 'bg-[#0F172A] text-white shadow-2xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
@@ -334,7 +341,7 @@ export const DeliveryStatusPage = () => {
                 }}
                 className={`px-3 py-1.5 rounded-xl font-bold transition cursor-pointer flex items-center gap-1.5 flex-shrink-0 border ${
                   isSelected
-                    ? `${config.badgeClass} ring-2 ring-orange-500/30 shadow-xs font-extrabold`
+                    ? `${config.badgeClass} ring-2 ring-orange-500/30 shadow-2xs font-extrabold`
                     : 'bg-white border-slate-200/90 text-slate-600 hover:bg-slate-50'
                 }`}
               >
@@ -351,7 +358,7 @@ export const DeliveryStatusPage = () => {
 
       {/* ------------------- TABLE VIEW ------------------- */}
       {viewMode === 'table' && (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
           {filteredShipments.length === 0 ? (
             <div className="p-8">
               <EmptyState
@@ -367,10 +374,10 @@ export const DeliveryStatusPage = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
+              <table className="w-full text-left text-xs sm:text-sm border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-bold uppercase tracking-wider">
-                    <th className="py-3 px-4 w-10 text-center">
+                  <tr className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+                    <th className="py-4 px-4 w-10 text-center">
                       <input
                         type="checkbox"
                         onChange={handleSelectAll}
@@ -378,12 +385,12 @@ export const DeliveryStatusPage = () => {
                         className="rounded border-slate-300 text-[#FF6B00] focus:ring-orange-200 cursor-pointer"
                       />
                     </th>
-                    <th className="py-3 px-4">Tracking Number</th>
-                    <th className="py-3 px-4">Sender ➔ Consignee</th>
-                    <th className="py-3 px-4">Delivery Status</th>
-                    <th className="py-3 px-4">Current Location / Hub</th>
-                    <th className="py-3 px-4">Expected ETA</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                    <th className="py-4 px-4">Tracking Code</th>
+                    <th className="py-4 px-4">Consignor ➔ Consignee</th>
+                    <th className="py-4 px-4">Delivery Status</th>
+                    <th className="py-4 px-4">Current Location Hub</th>
+                    <th className="py-4 px-4">Target ETA</th>
+                    <th className="py-4 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -399,7 +406,7 @@ export const DeliveryStatusPage = () => {
                         }`}
                       >
                         {/* Checkbox */}
-                        <td className="py-3.5 px-4 text-center">
+                        <td className="py-4 px-4 text-center">
                           <input
                             type="checkbox"
                             checked={isSelected}
@@ -409,38 +416,41 @@ export const DeliveryStatusPage = () => {
                         </td>
 
                         {/* Tracking # */}
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                        <td className="py-4 px-4 font-mono font-bold text-slate-900">
                           <div className="flex items-center gap-1.5">
-                            <span className="hover:text-[#FF6B00] cursor-pointer" onClick={() => navigate(`/tracking?number=${s.trackingNumber}`)}>
+                            <span
+                              className="hover:text-[#FF6B00] cursor-pointer"
+                              onClick={() => navigate(`/tracking?number=${s.trackingNumber}`)}
+                            >
                               {s.trackingNumber}
                             </span>
                           </div>
                           <span className="text-[11px] text-slate-400 font-sans font-normal block">
-                            {s.parcelType} • {s.parcelWeight}
+                            {s.parcelType} • {s.parcelWeight} kg
                           </span>
                         </td>
 
                         {/* Sender -> Recipient */}
-                        <td className="py-3.5 px-4">
+                        <td className="py-4 px-4">
                           <p className="font-bold text-slate-800">{s.receiverName}</p>
                           <span className="text-slate-400 text-[11px]">From: {s.senderName}</span>
                         </td>
 
-                        {/* Color-coded Status Badge (Module 6 Requirement) */}
-                        <td className="py-3.5 px-4">
+                        {/* Color-coded Status Badge */}
+                        <td className="py-4 px-4">
                           <Badge status={s.deliveryStatus} size="sm" />
                           {s.statusHistory && s.statusHistory.length > 1 && (
                             <span className="text-[10px] text-slate-400 block mt-0.5">
-                              {s.statusHistory.length} status events logged
+                              {s.statusHistory.length} status events
                             </span>
                           )}
                         </td>
 
                         {/* Current Location */}
-                        <td className="py-3.5 px-4 max-w-xs">
+                        <td className="py-4 px-4 max-w-xs">
                           <div className="flex items-center gap-1.5">
                             <MapPin className="w-3.5 h-3.5 text-[#FF6B00] flex-shrink-0" />
-                            <span className="font-medium text-slate-800 truncate">{loc.hub}</span>
+                            <span className="font-semibold text-slate-800 truncate">{loc.hub}</span>
                           </div>
                           <span className="text-[10px] text-slate-400 block pl-5 truncate">
                             {loc.city} ({loc.pincode})
@@ -448,13 +458,13 @@ export const DeliveryStatusPage = () => {
                         </td>
 
                         {/* Expected Delivery Date */}
-                        <td className="py-3.5 px-4">
-                          <span className="font-semibold text-slate-800 block">{s.expectedDeliveryDate}</span>
+                        <td className="py-4 px-4">
+                          <span className="font-bold text-slate-800 block">{s.expectedDeliveryDate}</span>
                           <span className="text-[10px] text-slate-400">Shipped: {s.shippingDate}</span>
                         </td>
 
                         {/* Action Buttons */}
-                        <td className="py-3.5 px-4 text-right space-x-1.5">
+                        <td className="py-4 px-4 text-right space-x-1.5 whitespace-nowrap">
                           {/* Quick Update Button */}
                           <button
                             type="button"
@@ -462,10 +472,10 @@ export const DeliveryStatusPage = () => {
                               setTargetShipment(s);
                               setIsUpdateModalOpen(true);
                             }}
-                            className="px-2.5 py-1 bg-orange-50 hover:bg-orange-100 text-[#FF6B00] font-bold rounded-lg border border-orange-200/80 transition cursor-pointer inline-flex items-center gap-1 text-[11px]"
+                            className="px-3 py-1 bg-orange-50 hover:bg-orange-100 text-[#FF6B00] font-bold rounded-xl border border-orange-200/80 transition cursor-pointer inline-flex items-center gap-1 text-xs"
                             title="Update Status"
                           >
-                            <Edit3 className="w-3 h-3" />
+                            <Edit3 className="w-3.5 h-3.5" />
                             <span>Update</span>
                           </button>
 
@@ -476,21 +486,21 @@ export const DeliveryStatusPage = () => {
                               setTargetShipment(s);
                               setIsHistoryModalOpen(true);
                             }}
-                            className="px-2.5 py-1 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-lg border border-slate-200 transition cursor-pointer inline-flex items-center gap-1 text-[11px]"
+                            className="px-3 py-1 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold rounded-xl border border-slate-200 transition cursor-pointer inline-flex items-center gap-1 text-xs"
                             title="Status History Audit"
                           >
-                            <History className="w-3 h-3 text-slate-500" />
-                            <span>History</span>
+                            <History className="w-3.5 h-3.5 text-slate-500" />
+                            <span>Audit</span>
                           </button>
 
                           {/* Track GPS link */}
                           <button
                             type="button"
                             onClick={() => navigate(`/tracking?number=${s.trackingNumber}`)}
-                            className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-lg transition cursor-pointer"
+                            className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-800 rounded-xl transition cursor-pointer inline-flex items-center"
                             title="Open live tracking"
                           >
-                            <ExternalLink className="w-3.5 h-3.5" />
+                            <ExternalLink className="w-4 h-4" />
                           </button>
                         </td>
                       </tr>
@@ -503,7 +513,7 @@ export const DeliveryStatusPage = () => {
 
           {/* Table Pagination Footer */}
           {filteredShipments.length > 0 && (
-            <div className="px-4 py-3 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+            <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
               <span>
                 Showing <strong>{(currentPage - 1) * itemsPerPage + 1}</strong> to{' '}
                 <strong>{Math.min(currentPage * itemsPerPage, filteredShipments.length)}</strong> of{' '}
@@ -515,19 +525,19 @@ export const DeliveryStatusPage = () => {
                   type="button"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 transition cursor-pointer flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 transition cursor-pointer flex items-center gap-1 font-semibold"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   <span>Prev</span>
                 </button>
-                <span className="px-2 font-bold text-slate-700">
+                <span className="px-3 font-bold text-slate-700">
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
                   type="button"
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 transition cursor-pointer flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 transition cursor-pointer flex items-center gap-1 font-semibold"
                 >
                   <span>Next</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -554,12 +564,12 @@ export const DeliveryStatusPage = () => {
             return (
               <div
                 key={col.key}
-                className={`rounded-2xl border ${col.color} p-3.5 flex flex-col max-h-[750px] shadow-2xs`}
+                className={`rounded-3xl border ${col.color} p-4 flex flex-col max-h-[750px] shadow-2xs`}
               >
                 {/* Column Header */}
                 <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/80">
                   <span className="font-extrabold text-xs text-slate-800">{col.title}</span>
-                  <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-white shadow-2xs text-slate-700">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white shadow-2xs text-slate-700">
                     {colShipments.length}
                   </span>
                 </div>
@@ -574,9 +584,9 @@ export const DeliveryStatusPage = () => {
                     colShipments.map((s) => (
                       <div
                         key={s.id}
-                        className="bg-white rounded-xl border border-slate-200/90 p-3.5 shadow-2xs hover:border-orange-300 hover:shadow-xs transition"
+                        className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs hover:border-orange-300 hover:shadow-md transition"
                       >
-                        <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center justify-between mb-2">
                           <span className="font-mono text-xs font-bold text-slate-900">{s.trackingNumber}</span>
                           <Badge status={s.deliveryStatus} size="sm" />
                         </div>
@@ -589,19 +599,19 @@ export const DeliveryStatusPage = () => {
                         </span>
 
                         <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
-                          <span>{s.parcelWeight}</span>
+                          <span>{s.parcelWeight} kg</span>
                           <span>ETA: {s.expectedDeliveryDate}</span>
                         </div>
 
                         {/* Kanban Actions */}
-                        <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+                        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1">
                           <button
                             type="button"
                             onClick={() => {
                               setTargetShipment(s);
                               setIsUpdateModalOpen(true);
                             }}
-                            className="text-[11px] font-bold text-[#FF6B00] hover:text-[#EA580C] cursor-pointer"
+                            className="text-xs font-bold text-[#FF6B00] hover:text-[#EA580C] cursor-pointer"
                           >
                             Edit Status
                           </button>
@@ -610,7 +620,7 @@ export const DeliveryStatusPage = () => {
                             <button
                               type="button"
                               onClick={() => advanceStatus(s)}
-                              className="px-2 py-1 rounded bg-slate-100 hover:bg-orange-100 text-slate-700 hover:text-[#FF6B00] text-[10px] font-bold flex items-center gap-1 transition cursor-pointer"
+                              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-orange-100 text-slate-700 hover:text-[#FF6B00] text-[11px] font-bold flex items-center gap-1 transition cursor-pointer"
                             >
                               <span>Advance</span>
                               <ChevronRight className="w-3 h-3" />
@@ -629,9 +639,9 @@ export const DeliveryStatusPage = () => {
 
       {/* Bulk Status Update Modal */}
       {isBulkModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md p-6 space-y-4">
-            <h3 className="text-base font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md p-6 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900">
               Bulk Status Update ({selectedIds.length} parcels)
             </h3>
             <p className="text-xs text-slate-500">
@@ -645,7 +655,7 @@ export const DeliveryStatusPage = () => {
               <select
                 value={bulkStatus}
                 onChange={(e) => setBulkStatus(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:border-[#FF6B00]"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-[#FF6B00]"
               >
                 {DELIVERY_STATUSES.map((st) => (
                   <option key={st} value={st}>
@@ -655,18 +665,18 @@ export const DeliveryStatusPage = () => {
               </select>
             </div>
 
-            <div className="pt-2 flex items-center justify-end gap-3">
+            <div className="pt-3 flex items-center justify-end gap-2.5">
               <button
                 type="button"
                 onClick={() => setIsBulkModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer transition"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleExecuteBulkUpdate}
-                className="px-5 py-2 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer"
+                className="px-5 py-2.5 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer"
               >
                 Apply to {selectedIds.length} Parcels
               </button>

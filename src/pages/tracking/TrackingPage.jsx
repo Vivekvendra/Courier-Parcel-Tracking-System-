@@ -23,7 +23,11 @@ import {
   ChevronRight,
   History,
   Edit3,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  Share2,
+  Navigation,
+  Activity
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useShipments } from '../../context/ShipmentContext';
@@ -78,7 +82,7 @@ export const TrackingPage = () => {
       setTrackingInput(defaultNumber);
       setCurrentTrackingNumber(defaultNumber);
     }
-  }, [searchParams, shipments]);
+  }, [searchParams, shipments, currentTrackingNumber]);
 
   // Current single shipment
   const activeShipment = useMemo(() => {
@@ -138,6 +142,20 @@ export const TrackingPage = () => {
     window.print();
   };
 
+  // Share tracking link
+  const handleShare = () => {
+    if (navigator.share && activeShipment) {
+      navigator.share({
+        title: `Track Parcel ${activeShipment.trackingNumber}`,
+        text: `Tracking status for shipment ${activeShipment.trackingNumber}`,
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success('Direct tracking link copied to clipboard!');
+    }
+  };
+
   // Derived tracking data for single view
   const timelineEvents = useMemo(() => {
     if (!activeShipment) return [];
@@ -154,44 +172,35 @@ export const TrackingPage = () => {
     return getCourierAgentDetails(activeShipment);
   }, [activeShipment]);
 
-  // ETA Calculation text
-  const getEtaBadge = (status, date) => {
-    if (status === 'Delivered') return { text: 'Delivered', bg: 'bg-emerald-100 text-emerald-800' };
-    if (status === 'Cancelled') return { text: 'Cancelled', bg: 'bg-rose-100 text-rose-800' };
-    if (status === 'Failed Delivery') return { text: 'Action Needed', bg: 'bg-red-100 text-red-800' };
-    return { text: `Expected: ${date || 'In 2 days'}`, bg: 'bg-orange-100 text-[#FF6B00]' };
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-orange-100 text-[#FF6B00]">
-              Module 5 & 6
-            </span>
-            <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] tracking-tight">
-              Live Parcel Tracking & Timeline
-            </h1>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-[#FF6B00] text-xs font-bold mb-2">
+            <Activity className="w-3.5 h-3.5 animate-pulse" />
+            <span>Real-Time GPS Telemetry Radar</span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Real-time multi-carrier tracking, GPS routing checkpoints, and delivery status audit.
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0F172A] tracking-tight">
+            Parcel Tracking & Route Radar
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Real-time multi-carrier tracking, GPS routing checkpoints, and delivery status timeline.
           </p>
         </div>
 
         {/* Tab Switcher: Single vs Multi Tracking */}
-        <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200">
+        <div className="flex items-center p-1.5 bg-slate-100 rounded-2xl border border-slate-200 self-start md:self-auto">
           <button
             type="button"
             onClick={() => setActiveTab('single')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'single'
-                ? 'bg-white text-[#FF6B00] shadow-xs'
+                ? 'bg-white text-[#FF6B00] shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Compass className="w-3.5 h-3.5" />
+            <Compass className="w-4 h-4" />
             <span>Single Tracking</span>
           </button>
           <button
@@ -204,14 +213,14 @@ export const TrackingPage = () => {
                 setMultiInput(initial3.join(', '));
               }
             }}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'multiple'
-                ? 'bg-white text-[#FF6B00] shadow-xs'
+                ? 'bg-white text-[#FF6B00] shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Track Multiple ({trackedNumbersList.length || 'Multi'})</span>
+            <Layers className="w-4 h-4" />
+            <span>Track Multiple ({trackedNumbersList.length || 'Batch'})</span>
           </button>
         </div>
       </div>
@@ -220,7 +229,7 @@ export const TrackingPage = () => {
       {activeTab === 'single' && (
         <>
           {/* Tracking Search Box Card */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-xs">
+          <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
             <form onSubmit={handleSingleSearch} className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -229,29 +238,29 @@ export const TrackingPage = () => {
                   value={trackingInput}
                   onChange={(e) => setTrackingInput(e.target.value)}
                   placeholder="Enter Tracking Number (e.g. TRK-9821-BLR, TRK-9820-MUM)..."
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6B00] focus:ring-2 focus:ring-orange-100 transition"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6B00] transition"
                 />
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-sm font-bold rounded-xl shadow-md shadow-orange-500/20 transition flex items-center justify-center gap-2 cursor-pointer"
+                className="px-6 py-3 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md shadow-orange-500/20 transition flex items-center justify-center gap-2 cursor-pointer shrink-0"
               >
                 <Compass className="w-4 h-4" />
-                <span>Track Parcel</span>
+                <span>Track Parcel Now</span>
               </button>
             </form>
 
             {/* Quick Suggestion Chips */}
-            <div className="mt-3.5 flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-slate-500 font-semibold">Active Parcels:</span>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs pt-3 border-t border-slate-100">
+              <span className="text-slate-400 font-bold mr-1">Active Parcels:</span>
               {shipments.slice(0, 6).map((s) => (
                 <button
                   key={s.id}
                   type="button"
                   onClick={() => handleSelectChip(s.trackingNumber)}
-                  className={`px-2.5 py-1 rounded-lg border font-mono transition cursor-pointer ${
+                  className={`px-3 py-1 rounded-xl border font-mono text-xs transition cursor-pointer ${
                     currentTrackingNumber.toLowerCase() === s.trackingNumber.toLowerCase()
-                      ? 'bg-orange-50 border-[#FF6B00] text-[#FF6B00] font-bold'
+                      ? 'bg-orange-50 border-[#FF6B00] text-[#FF6B00] font-bold shadow-2xs'
                       : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                   }`}
                 >
@@ -263,7 +272,7 @@ export const TrackingPage = () => {
 
           {/* If No Active Shipment Found */}
           {!activeShipment ? (
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-8 shadow-xs">
+            <div className="bg-white rounded-3xl border border-slate-200/90 p-8 shadow-2xs">
               <EmptyState
                 icon={Compass}
                 title={`No tracking record found for "${currentTrackingNumber}"`}
@@ -279,50 +288,54 @@ export const TrackingPage = () => {
           ) : (
             <div className="space-y-6">
               {/* Top Banner: Tracking Overview & Quick Action Toolbar */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-[#1E293B] rounded-2xl p-5 sm:p-6 text-white shadow-md relative overflow-hidden">
+              <div className="bg-gradient-to-r from-slate-950 via-[#0F172A] to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-xl relative overflow-hidden border border-slate-800">
+                {/* Background radar ring effect */}
+                <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full border border-white/5 pointer-events-none" />
+                <div className="absolute -right-8 -top-8 w-64 h-64 rounded-full border border-orange-500/10 pointer-events-none" />
+
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
                   <div>
-                    <div className="flex flex-wrap items-center gap-2.5 mb-2">
-                      <span className="font-mono text-base sm:text-lg font-bold tracking-wider text-orange-400">
+                    <div className="flex flex-wrap items-center gap-3 mb-2.5">
+                      <span className="font-mono text-lg sm:text-2xl font-black tracking-wider text-orange-400">
                         {activeShipment.trackingNumber}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleCopyTracking(activeShipment.trackingNumber)}
-                        className="p-1 hover:bg-white/10 rounded text-slate-300 hover:text-white transition cursor-pointer"
+                        className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
                         title="Copy tracking code"
                       >
-                        <Copy className="w-3.5 h-3.5" />
+                        <Copy className="w-4 h-4" />
                       </button>
                       <Badge status={activeShipment.deliveryStatus} size="sm" />
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300">
-                      <span>Shipped: <strong className="text-white">{activeShipment.shippingDate}</strong></span>
-                      <span>•</span>
-                      <span>Type: <strong className="text-white">{activeShipment.parcelType}</strong></span>
-                      <span>•</span>
-                      <span>Weight: <strong className="text-white">{activeShipment.parcelWeight}</strong></span>
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
+                      <span>Shipped: <strong className="text-white font-semibold">{activeShipment.shippingDate}</strong></span>
+                      <span className="text-slate-600">•</span>
+                      <span>Category: <strong className="text-white font-semibold">{activeShipment.parcelType}</strong></span>
+                      <span className="text-slate-600">•</span>
+                      <span>Weight: <strong className="text-white font-semibold">{activeShipment.parcelWeight} kg</strong></span>
                     </div>
                   </div>
 
                   {/* Actions & ETA */}
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="bg-white/10 backdrop-blur-xs border border-white/15 px-4 py-2.5 rounded-xl text-left">
-                      <span className="text-[11px] text-slate-300 block uppercase font-bold tracking-wider">
-                        Estimated Delivery
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/15 px-4 py-2.5 rounded-2xl text-left">
+                      <span className="text-[10px] text-slate-300 block uppercase font-bold tracking-wider">
+                        Target Delivery
                       </span>
-                      <span className="text-sm sm:text-base font-extrabold text-white flex items-center gap-1.5">
+                      <span className="text-sm sm:text-base font-black text-white flex items-center gap-1.5 mt-0.5">
                         <Calendar className="w-4 h-4 text-[#FF6B00]" />
                         {activeShipment.expectedDeliveryDate}
                       </span>
                     </div>
 
-                    {/* Module 6 Action: Update Status Modal Button */}
+                    {/* Update Status Button */}
                     <button
                       type="button"
                       onClick={() => setIsStatusModalOpen(true)}
-                      className="px-4 py-2.5 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer"
+                      className="px-4 py-2.5 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md transition flex items-center gap-2 cursor-pointer"
                     >
                       <Edit3 className="w-4 h-4" />
                       <span>Update Status</span>
@@ -332,38 +345,43 @@ export const TrackingPage = () => {
                     <button
                       type="button"
                       onClick={() => setIsHistoryModalOpen(true)}
-                      className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold rounded-xl border border-white/20 transition flex items-center gap-1.5 cursor-pointer"
+                      className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold rounded-2xl border border-white/20 transition flex items-center gap-1.5 cursor-pointer"
                     >
                       <History className="w-4 h-4" />
                       <span>Audit Logs ({activeShipment.statusHistory?.length || 1})</span>
+                    </button>
+
+                    {/* Share */}
+                    <button
+                      type="button"
+                      onClick={handleShare}
+                      className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-2xl border border-white/20 transition cursor-pointer"
+                      title="Share Tracking Details"
+                    >
+                      <Share2 className="w-4 h-4" />
                     </button>
 
                     {/* Print */}
                     <button
                       type="button"
                       onClick={handlePrint}
-                      className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/20 transition cursor-pointer"
+                      className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-2xl border border-white/20 transition cursor-pointer"
                       title="Print Tracking Summary"
                     >
                       <Printer className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
-
-                {/* Subtle Geometric Background */}
-                <div className="absolute right-0 bottom-0 pointer-events-none opacity-10">
-                  <Truck className="w-64 h-64 -mr-10 -mb-10 text-white" />
-                </div>
               </div>
 
               {/* Grid: Live Location Map / Route Visualizer + Current Checkpoint */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* 2 Cols: Interactive Stylized Route Visualizer */}
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+                <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-orange-100 text-[#FF6B00] flex items-center justify-center">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-orange-50 text-[#FF6B00] flex items-center justify-center">
                           <MapPin className="w-4 h-4" />
                         </div>
                         <div>
@@ -371,19 +389,19 @@ export const TrackingPage = () => {
                             Live Route & Current Location
                           </h3>
                           <p className="text-xs text-slate-500">
-                            Telemetry checkpoint & geographic route corridor
+                            Telemetry checkpoint & geographic corridor
                           </p>
                         </div>
                       </div>
 
-                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                      <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-600">
                         GPS Active • 99.8% Accuracy
                       </span>
                     </div>
 
                     {/* Route Checkpoints Bar */}
-                    <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200/80 mb-5">
-                      <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-2">
+                    <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 mb-5">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-2.5">
                         <div className="flex items-center gap-1.5">
                           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                           <span>Origin: {activeShipment.pickupAddress?.split(',').slice(-2).join(',') || 'Origin'}</span>
@@ -413,7 +431,7 @@ export const TrackingPage = () => {
                     </div>
 
                     {/* Stylized Vector Route Canvas */}
-                    <div className="relative h-48 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl overflow-hidden border border-slate-700/60 p-4 flex flex-col justify-between">
+                    <div className="relative h-48 bg-gradient-to-br from-slate-950 via-[#0F172A] to-slate-900 rounded-2xl overflow-hidden border border-slate-800 p-4 flex flex-col justify-between">
                       {/* Grid overlay */}
                       <div
                         className="absolute inset-0 opacity-15 pointer-events-none"
@@ -425,9 +443,9 @@ export const TrackingPage = () => {
 
                       {/* Header in map */}
                       <div className="relative z-10 flex items-center justify-between text-xs text-slate-300">
-                        <span className="flex items-center gap-1.5 font-bold text-white">
+                        <span className="flex items-center gap-2 font-bold text-white">
                           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                          Live Tracking Radar
+                          Live Hub Tracking Radar
                         </span>
                         <span className="font-mono text-slate-400">
                           {currentLocation?.coordinates || '12.9716° N, 77.5946° E'}
@@ -438,17 +456,17 @@ export const TrackingPage = () => {
                       <div className="relative z-10 my-auto flex items-center justify-around">
                         {/* Origin Node */}
                         <div className="text-center">
-                          <div className="w-9 h-9 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-300 mx-auto shadow-md">
+                          <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-emerald-300 mx-auto shadow-md">
                             <Package className="w-4 h-4" />
                           </div>
-                          <span className="text-[11px] font-bold text-slate-200 block mt-1">Origin Facility</span>
+                          <span className="text-[11px] font-bold text-slate-200 block mt-1.5">Origin Facility</span>
                           <span className="text-[10px] text-slate-400">{activeShipment.pickupAddress?.split(',').slice(-1)[0]}</span>
                         </div>
 
                         {/* Animated Line Connector */}
                         <div className="flex-1 mx-4 relative flex items-center justify-center">
                           <div className="w-full h-0.5 border-t-2 border-dashed border-orange-400/60" />
-                          <div className="absolute px-3 py-1 bg-orange-500 text-white rounded-full text-[10px] font-extrabold shadow-lg animate-bounce flex items-center gap-1">
+                          <div className="absolute px-3 py-1 bg-[#FF6B00] text-white rounded-full text-[10px] font-extrabold shadow-lg flex items-center gap-1.5 animate-pulse">
                             <Truck className="w-3 h-3" />
                             <span>{activeShipment.deliveryStatus}</span>
                           </div>
@@ -456,16 +474,16 @@ export const TrackingPage = () => {
 
                         {/* Destination Node */}
                         <div className="text-center">
-                          <div className="w-9 h-9 rounded-full bg-[#FF6B00]/20 border-2 border-[#FF6B00] flex items-center justify-center text-orange-400 mx-auto shadow-md">
+                          <div className="w-10 h-10 rounded-2xl bg-[#FF6B00]/20 border-2 border-[#FF6B00] flex items-center justify-center text-orange-400 mx-auto shadow-md">
                             <MapPin className="w-4 h-4" />
                           </div>
-                          <span className="text-[11px] font-bold text-slate-200 block mt-1">Delivery Hub</span>
+                          <span className="text-[11px] font-bold text-slate-200 block mt-1.5">Destination Hub</span>
                           <span className="text-[10px] text-slate-400">{activeShipment.deliveryAddress?.split(',').slice(-1)[0]}</span>
                         </div>
                       </div>
 
                       {/* Map Footer Info */}
-                      <div className="relative z-10 flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-700/80">
+                      <div className="relative z-10 flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800">
                         <span>Current Hub: <strong className="text-white">{currentLocation?.hub}</strong></span>
                         <span>Last GPS ping: <strong className="text-orange-300">{currentLocation?.lastScanned}</strong></span>
                       </div>
@@ -476,14 +494,14 @@ export const TrackingPage = () => {
                 {/* 1 Col: Location & Courier Driver Card */}
                 <div className="space-y-4">
                   {/* Current Location Card */}
-                  <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs">
+                  <div className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-2xs">
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
                       Current Parcel Location
                     </h4>
 
                     <div className="space-y-3">
-                      <div className="p-3 bg-orange-50/50 rounded-xl border border-orange-100">
-                        <span className="text-[11px] text-slate-500 block">Facility Name</span>
+                      <div className="p-3.5 bg-orange-50/50 rounded-2xl border border-orange-100">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Facility Hub</span>
                         <p className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5">
                           {currentLocation?.hub}
                         </p>
@@ -491,30 +509,30 @@ export const TrackingPage = () => {
 
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="p-2.5 bg-slate-50 rounded-xl">
-                          <span className="text-slate-400 block text-[10px]">City / State</span>
+                          <span className="text-slate-400 block text-[10px] font-bold uppercase">City / State</span>
                           <span className="font-bold text-slate-800">{currentLocation?.city}</span>
                         </div>
                         <div className="p-2.5 bg-slate-50 rounded-xl">
-                          <span className="text-slate-400 block text-[10px]">Postal Code</span>
+                          <span className="text-slate-400 block text-[10px] font-bold uppercase">Postal Code</span>
                           <span className="font-mono font-bold text-slate-800">{currentLocation?.pincode}</span>
                         </div>
                       </div>
 
                       <div className="p-2.5 bg-slate-50 rounded-xl text-xs">
-                        <span className="text-slate-400 block text-[10px]">Status Telemetry</span>
+                        <span className="text-slate-400 block text-[10px] font-bold uppercase">Telemetry Status</span>
                         <span className="font-medium text-slate-700">{currentLocation?.statusText}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Assigned Courier Agent Card */}
-                  <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs">
+                  <div className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-2xs">
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
                       Assigned Courier Driver
                     </h4>
 
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-orange-500 to-amber-400 text-white font-bold flex items-center justify-center text-sm shadow-sm flex-shrink-0">
+                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#FF6B00] to-amber-400 text-white font-bold flex items-center justify-center text-sm shadow-sm flex-shrink-0">
                         {courierInfo?.name?.split(' ').map((n) => n[0]).join('') || 'CA'}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -523,22 +541,24 @@ export const TrackingPage = () => {
                       </div>
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-600">
+                    <div className="mt-3.5 pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-600">
                       <div className="flex items-center gap-2">
                         <Car className="w-3.5 h-3.5 text-slate-400" />
                         <span className="font-mono text-[11px] font-semibold text-slate-800">{courierInfo?.vehicle}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Phone className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="font-medium">{courierInfo?.phone}</span>
+                        <a href={`tel:${courierInfo?.phone}`} className="font-medium hover:text-[#FF6B00]">
+                          {courierInfo?.phone}
+                        </a>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Shipment Timeline & Step Tracker (Module 5 Feature) */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-xs">
+              {/* Shipment Timeline & Step Tracker */}
+              <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-2xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -555,7 +575,7 @@ export const TrackingPage = () => {
                 </div>
 
                 {/* Timeline Stepper */}
-                <div className="relative pl-6 sm:pl-8 space-y-8 before:absolute before:left-3 sm:before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
+                <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-3 sm:before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
                   {timelineEvents.map((step, idx) => {
                     const isCompleted = step.completed;
                     const isCurrent = step.current;
@@ -566,7 +586,7 @@ export const TrackingPage = () => {
                       <div key={step.id || idx} className="relative group">
                         {/* Stepper Bullet */}
                         <div
-                          className={`absolute -left-6 sm:-left-8 top-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 flex items-center justify-center transition-all ${
+                          className={`absolute -left-6 sm:-left-8 top-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 flex items-center justify-center transition-all ${
                             isFailed
                               ? 'border-red-500 bg-red-50 text-red-600 ring-4 ring-red-500/20'
                               : isCancelled
@@ -591,7 +611,7 @@ export const TrackingPage = () => {
 
                         {/* Step Card */}
                         <div
-                          className={`p-4 rounded-xl border transition-all ${
+                          className={`p-4 sm:p-5 rounded-2xl border transition-all ${
                             isCurrent
                               ? 'bg-orange-50/40 border-orange-200 shadow-2xs'
                               : isCompleted
@@ -603,7 +623,7 @@ export const TrackingPage = () => {
                             <div className="flex items-center gap-2">
                               <h4 className="text-sm font-bold text-slate-900">{step.title}</h4>
                               {isCurrent && (
-                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#FF6B00] text-white">
+                                <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-[#FF6B00] text-white">
                                   CURRENT STAGE
                                 </span>
                               )}
@@ -628,19 +648,19 @@ export const TrackingPage = () => {
                 </div>
               </div>
 
-              {/* Comprehensive Shipment Summary Card (Module 5 Feature) */}
-              <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-xs">
+              {/* Comprehensive Shipment Summary Card */}
+              <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-2xs">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Package className="w-5 h-5 text-[#FF6B00]" />
                     <span>Shipment Profile & Booking Summary</span>
                   </div>
-                  <span className="text-xs font-normal text-slate-500">ID: {activeShipment.id}</span>
+                  <span className="text-xs font-mono text-slate-400">ID: {activeShipment.id}</span>
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                   {/* Sender */}
-                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Sender / Shipper
                     </span>
@@ -652,7 +672,7 @@ export const TrackingPage = () => {
                   </div>
 
                   {/* Recipient */}
-                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Recipient / Consignee
                     </span>
@@ -664,7 +684,7 @@ export const TrackingPage = () => {
                   </div>
 
                   {/* Parcel Details */}
-                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Cargo Specification
                     </span>
@@ -674,7 +694,7 @@ export const TrackingPage = () => {
                     </div>
                     <div className="flex justify-between py-1 border-b border-slate-200/60">
                       <span className="text-slate-500">Gross Weight</span>
-                      <strong className="text-slate-800">{activeShipment.parcelWeight}</strong>
+                      <strong className="text-slate-800">{activeShipment.parcelWeight} kg</strong>
                     </div>
                     <div className="flex justify-between py-1">
                       <span className="text-slate-500">Service Level</span>
@@ -683,7 +703,7 @@ export const TrackingPage = () => {
                   </div>
 
                   {/* Instructions & Security */}
-                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Handling Notes & Security
                     </span>
@@ -706,7 +726,7 @@ export const TrackingPage = () => {
       {activeTab === 'multiple' && (
         <div className="space-y-6">
           {/* Multi-Tracking Search Input Box */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-xs">
+          <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
             <h3 className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
               <Layers className="w-5 h-5 text-[#FF6B00]" />
               <span>Track Multiple Shipments Simultaneously</span>
@@ -721,20 +741,20 @@ export const TrackingPage = () => {
                 value={multiInput}
                 onChange={(e) => setMultiInput(e.target.value)}
                 placeholder="e.g. TRK-9821-BLR, TRK-9820-MUM, TRK-9819-DEL, TRK-9818-HYD"
-                className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6B00] focus:ring-2 focus:ring-orange-100 transition resize-none"
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm font-mono text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6B00] transition resize-none"
               />
 
               <div className="flex flex-wrap items-center justify-between gap-3">
                 {/* Quick Add All Available */}
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-slate-500 font-semibold">Quick Add:</span>
+                  <span className="text-slate-400 font-bold">Quick Add:</span>
                   <button
                     type="button"
                     onClick={() => {
                       const all = shipments.map((s) => s.trackingNumber).join(', ');
                       setMultiInput(all);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition cursor-pointer"
                   >
                     Select All ({shipments.length})
                   </button>
@@ -744,7 +764,7 @@ export const TrackingPage = () => {
                       const top4 = shipments.slice(0, 4).map((s) => s.trackingNumber).join(', ');
                       setMultiInput(top4);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-orange-50 hover:bg-orange-100 text-[#FF6B00] font-bold transition cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 text-[#FF6B00] font-bold transition cursor-pointer"
                   >
                     First 4 Parcels
                   </button>
@@ -752,7 +772,7 @@ export const TrackingPage = () => {
 
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-2.5 bg-[#FF6B00] hover:bg-[#EA580C] text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md transition flex items-center gap-2 cursor-pointer"
                 >
                   <Search className="w-4 h-4" />
                   <span>Track {trackedNumbersList.length} Parcels</span>
@@ -764,25 +784,25 @@ export const TrackingPage = () => {
           {/* Batch Status Metrics */}
           {multiShipments.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs">
-                <span className="text-xs text-slate-400 font-medium">Total Tracked</span>
-                <p className="text-xl font-black text-slate-900 mt-0.5">{multiShipments.length}</p>
+              <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                <span className="text-xs text-slate-400 font-bold uppercase">Total Tracked</span>
+                <p className="text-2xl font-black text-slate-900 mt-1">{multiShipments.length}</p>
               </div>
-              <div className="p-3.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs">
-                <span className="text-xs text-blue-500 font-medium">In Transit</span>
-                <p className="text-xl font-black text-blue-600 mt-0.5">
+              <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                <span className="text-xs text-blue-500 font-bold uppercase">In Transit</span>
+                <p className="text-2xl font-black text-blue-600 mt-1">
                   {multiShipments.filter((s) => s.deliveryStatus === 'In Transit').length}
                 </p>
               </div>
-              <div className="p-3.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs">
-                <span className="text-xs text-purple-500 font-medium">Out for Delivery</span>
-                <p className="text-xl font-black text-purple-600 mt-0.5">
+              <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                <span className="text-xs text-purple-500 font-bold uppercase">Out for Delivery</span>
+                <p className="text-2xl font-black text-purple-600 mt-1">
                   {multiShipments.filter((s) => s.deliveryStatus === 'Out for Delivery').length}
                 </p>
               </div>
-              <div className="p-3.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs">
-                <span className="text-xs text-emerald-500 font-medium">Delivered</span>
-                <p className="text-xl font-black text-emerald-600 mt-0.5">
+              <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-2xs">
+                <span className="text-xs text-emerald-500 font-bold uppercase">Delivered</span>
+                <p className="text-2xl font-black text-emerald-600 mt-1">
                   {multiShipments.filter((s) => s.deliveryStatus === 'Delivered').length}
                 </p>
               </div>
@@ -791,7 +811,7 @@ export const TrackingPage = () => {
 
           {/* Comparative Multi-Tracking Cards Grid */}
           {multiShipments.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-8 shadow-xs">
+            <div className="bg-white rounded-3xl border border-slate-200/90 p-8 shadow-2xs">
               <EmptyState
                 icon={Layers}
                 title="No Parcels Loaded for Batch Tracking"
@@ -812,12 +832,12 @@ export const TrackingPage = () => {
                 return (
                   <div
                     key={s.id}
-                    className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-orange-300 hover:shadow-md transition-all flex flex-col justify-between"
+                    className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs hover:border-orange-300 hover:shadow-md transition-all flex flex-col justify-between"
                   >
                     <div>
                       {/* Top Code & Status */}
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-mono text-xs sm:text-sm font-extrabold text-[#0F172A]">
+                        <span className="font-mono text-xs sm:text-sm font-black text-[#0F172A]">
                           {s.trackingNumber}
                         </span>
                         <Badge status={s.deliveryStatus} size="sm" />
@@ -843,7 +863,7 @@ export const TrackingPage = () => {
                           <span className="truncate text-[11px]">{loc.hub}</span>
                         </div>
                         <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100">
-                          <span className="text-slate-400">Weight: <strong>{s.parcelWeight}</strong></span>
+                          <span className="text-slate-400">Weight: <strong>{s.parcelWeight} kg</strong></span>
                           <span className="text-slate-700">ETA: <strong>{s.expectedDeliveryDate}</strong></span>
                         </div>
                       </div>
@@ -869,14 +889,11 @@ export const TrackingPage = () => {
         </div>
       )}
 
-      {/* Module 6 Status Update Modal */}
+      {/* Status Update Modal */}
       <StatusUpdateModal
         isOpen={isStatusModalOpen}
         onClose={() => setIsStatusModalOpen(false)}
         shipment={activeShipment}
-        onUpdated={() => {
-          // Updates context automatically
-        }}
       />
 
       {/* Audit History Modal */}

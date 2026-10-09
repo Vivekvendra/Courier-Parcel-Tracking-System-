@@ -869,7 +869,7 @@ export const DashboardPage = (props) => {
               }}
               className="w-full py-2.5 bg-[#FF6B00] hover:bg-[#EA580C] text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/20 cursor-pointer"
             >
-              <span>Open Full Tracking Radar & Audit (Module 5)</span>
+              <span>Open Full Tracking Radar & Audit</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </button>
           </div>

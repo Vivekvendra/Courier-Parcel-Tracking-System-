@@ -17,10 +17,12 @@ import {
 } from 'lucide-react';
 import TrackEaseLogo from '../../assets/TrackEaseLogo';
 import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationContext';
 import { toast } from 'react-toastify';
 
 export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen, onOpenTrackModal }) => {
   const { currentUser, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -39,45 +41,38 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
     {
       to: '/dashboard',
       label: 'Dashboard',
-      icon: LayoutDashboard,
-      badge: 'Active'
+      icon: LayoutDashboard
     },
     {
       to: '/shipments',
       label: 'Shipments',
-      icon: Package,
-      badge: 'M3'
+      icon: Package
     },
     {
       to: '/customers',
       label: 'Customers',
-      icon: Users,
-      badge: 'M4'
+      icon: Users
     },
     {
       to: '/tracking',
       label: 'Parcel Tracking',
-      icon: Compass,
-      badge: 'M5'
+      icon: Compass
     },
     {
       to: '/delivery-status',
       label: 'Delivery Status',
-      icon: Truck,
-      badge: 'M6'
+      icon: Truck
     },
     {
       to: '/notifications',
       label: 'Notifications',
       icon: Bell,
-      notifCount: 2,
-      badge: 'M7'
+      notifCount: unreadCount > 0 ? unreadCount : undefined
     },
     {
       to: '/reports',
       label: 'Reports & Analytics',
-      icon: BarChart3,
-      badge: 'M8'
+      icon: BarChart3
     },
     {
       to: '/settings',
@@ -87,10 +82,10 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
   ];
 
   const handleNavClick = (link, e) => {
-    const isImplemented = ['/dashboard', '/shipments', '/customers', '/tracking', '/delivery-status'].includes(link.to);
+    const isImplemented = ['/dashboard', '/shipments', '/customers', '/tracking', '/delivery-status', '/notifications'].includes(link.to);
     if (!isImplemented) {
       e.preventDefault();
-      toast.info(`${link.label} belongs to ${link.badge || 'Module'}. Upcoming module.`);
+      toast.info(`${link.label} is an upcoming feature.`);
     }
     if (isMobileOpen) {
       setIsMobileOpen(false);
@@ -182,19 +177,8 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
                       </span>
                       <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
                         {link.notifCount && (
-                          <span className="w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                          <span className="w-5 h-5 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-xs">
                             {link.notifCount}
-                          </span>
-                        )}
-                        {link.badge && (
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded font-bold transition-colors ${
-                              isActive
-                                ? 'bg-white/25 text-white'
-                                : 'bg-slate-100 text-slate-500 group-hover:bg-orange-100 group-hover:text-orange-700'
-                            }`}
-                          >
-                            {link.badge}
                           </span>
                         )}
                       </div>

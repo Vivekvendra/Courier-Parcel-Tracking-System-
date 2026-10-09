@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import { ShipmentProvider } from './context/ShipmentContext';
 import { CustomerProvider } from './context/CustomerContext';
 
@@ -17,12 +18,14 @@ import ShipmentsPage from './pages/shipments/ShipmentsPage';
 import CustomersPage from './pages/customers/CustomersPage';
 import TrackingPage from './pages/tracking/TrackingPage';
 import DeliveryStatusPage from './pages/delivery-status/DeliveryStatusPage';
+import NotificationsPage from './pages/notifications/NotificationsPage';
 
 function App() {
   return (
     <AuthProvider>
-      <ShipmentProvider>
-        <CustomerProvider>
+      <NotificationProvider>
+        <ShipmentProvider>
+          <CustomerProvider>
           <BrowserRouter>
             <Routes>
               {/* Public Authentication Routes */}
@@ -64,6 +67,7 @@ function App() {
                 <Route path="/customers" element={<CustomersPage />} />
                 <Route path="/tracking" element={<TrackingPage />} />
                 <Route path="/delivery-status" element={<DeliveryStatusPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
               </Route>
 
@@ -87,6 +91,7 @@ function App() {
           </BrowserRouter>
         </CustomerProvider>
       </ShipmentProvider>
+      </NotificationProvider>
     </AuthProvider>
   );
 }
