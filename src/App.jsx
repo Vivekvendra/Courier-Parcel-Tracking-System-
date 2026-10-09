@@ -19,6 +19,8 @@ import CustomersPage from './pages/customers/CustomersPage';
 import TrackingPage from './pages/tracking/TrackingPage';
 import DeliveryStatusPage from './pages/delivery-status/DeliveryStatusPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
+import ReportsPage from './pages/reports/ReportsPage';
+import SettingsPage from './pages/settings/SettingsPage';
 
 function App() {
   return (
@@ -68,6 +70,8 @@ function App() {
                 <Route path="/tracking" element={<TrackingPage />} />
                 <Route path="/delivery-status" element={<DeliveryStatusPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
               </Route>
 

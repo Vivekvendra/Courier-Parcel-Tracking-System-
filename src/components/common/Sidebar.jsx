@@ -82,7 +82,16 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobile
   ];
 
   const handleNavClick = (link, e) => {
-    const isImplemented = ['/dashboard', '/shipments', '/customers', '/tracking', '/delivery-status', '/notifications'].includes(link.to);
+    const isImplemented = [
+      '/dashboard',
+      '/shipments',
+      '/customers',
+      '/tracking',
+      '/delivery-status',
+      '/notifications',
+      '/reports',
+      '/settings'
+    ].includes(link.to);
     if (!isImplemented) {
       e.preventDefault();
       toast.info(`${link.label} is an upcoming feature.`);
